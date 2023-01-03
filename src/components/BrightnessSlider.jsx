@@ -2,7 +2,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 
 const BrightnessSlider = () => {
-  const [brightness, setBrightness] = useState()
+  const [brightness, setBrightness] = useState(100)
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/27`)
