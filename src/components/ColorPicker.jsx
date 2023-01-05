@@ -4,10 +4,12 @@ import axios from "axios"
 import ColorContext from "../contexts/ColorContext"
 import hueXYBriToRgb from "../functions/hueXYBriToRgb"
 import ColorLoopContext from "../contexts/ColorLoopContext"
+import LampNumberContext from "../contexts/LampNumberContext"
 
 const ColorPicker = () => {
   const { colorLoop, setColorLoop } = useContext(ColorLoopContext)
   const { color, setColor } = useContext(ColorContext)
+  const { lampNumber } = useContext(LampNumberContext)
   function rgbToHex(r, g, b) {
     if (r > 255 || g > 255 || b > 255) throw "Invalid color component"
     return ((r << 16) | (g << 8) | b).toString(16)
@@ -15,7 +17,7 @@ const ColorPicker = () => {
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/27`)
+      .get(`${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/${lampNumber}`)
       .then((response) => {
         setColor(
           "#" +
@@ -29,14 +31,14 @@ const ColorPicker = () => {
       .catch((error) => {
         console.log(error)
       })
-  }, [])
+  }, [lampNumber])
 
   const handleChangeComplete = (color) => {
     setColor(color.hex)
     setColorLoop("off")
     axios
       .put(
-        `${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/27/state`,
+        `${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/${lampNumber}/state`,
         {
           hue: Math.round(color.hsl.h * 182.04),
           sat: Math.round(color.hsl.s * 254),
@@ -53,7 +55,7 @@ const ColorPicker = () => {
       })
   }
 
-  return <SketchPicker color={color} width="400px" onChangeComplete={handleChangeComplete} />
+  return <SketchPicker color={color} width="250px" onChangeComplete={handleChangeComplete} />
 }
 
 export default ColorPicker

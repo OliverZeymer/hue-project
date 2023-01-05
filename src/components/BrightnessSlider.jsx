@@ -1,24 +1,28 @@
 import axios from "axios"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import LampNumberContext from "../contexts/LampNumberContext"
+
+//Write a description for a business where you can control your phillips hue lights and lamps
 
 const BrightnessSlider = () => {
   const [brightness, setBrightness] = useState(100)
+  const { lampNumber } = useContext(LampNumberContext)
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/27`)
+      .get(`${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/${lampNumber}`)
       .then((response) => {
         setBrightness(Math.round(response.data.state.bri / 2.54))
       })
       .catch((error) => {
         console.log(error)
       })
-  }, [])
+  }, [lampNumber])
 
   const handleChange = (event) => {
     setBrightness(event.target.value)
     axios
       .put(
-        `${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/27/state`,
+        `${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/${lampNumber}/state`,
         {
           bri: Math.round(event.target.value * 2.54),
         },

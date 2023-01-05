@@ -2,27 +2,29 @@ import axios from "axios"
 import { useContext, useEffect, useState } from "react"
 import { IoBulbOutline, IoBulb } from "react-icons/io5"
 import ColorLoopContext from "../contexts/ColorLoopContext"
+import LampNumberContext from "../contexts/LampNumberContext"
 
 const LightSwitchButton = () => {
   const [state, setState] = useState()
   const { colorLoop, setColorLoop } = useContext(ColorLoopContext)
+  const { lampNumber } = useContext(LampNumberContext)
 
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/27`)
+      .get(`${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/${lampNumber}`)
       .then((response) => {
         setState(response.data.state.on ? "on" : "off")
       })
       .catch((error) => {
         console.log(error)
       })
-  }, [state])
+  }, [state, lampNumber])
 
   const lampHandler = () => {
     setColorLoop("off")
     axios
       .put(
-        `${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/27/state`,
+        `${import.meta.env.VITE_HUE_BRIDGE_IP}/api/${import.meta.env.VITE_HUE_USERNAME}/lights/${lampNumber}/state`,
         {
           on: state === "on" ? false : true,
         },
@@ -33,7 +35,7 @@ const LightSwitchButton = () => {
         }
       )
       .then((response) => {
-        setState(response.data[0].success["/lights/27/state/on"] ? "on" : "off")
+        setState(response.data[0].success[`/lights/${lampNumber}/state/on`] ? "on" : "off")
       })
       .catch((error) => {
         console.log(error)
